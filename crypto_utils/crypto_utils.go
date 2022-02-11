@@ -1,17 +1,31 @@
 package crypto_utils
 
 import (
-	"crypto/md5"
-	"encoding/hex"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
 	expirationTime = 24 // in hours
 )
 
-func GetMd5(input string) string {
-	hash := md5.New()
-	defer hash.Reset()
-	hash.Write([]byte(input))
-	return hex.EncodeToString(hash.Sum(nil))
+//Hash implements root.Hash
+type Hash struct{}
+
+//Generate a salted hash for the input string
+func (c *Hash) Generate(s string) (string, error) {
+	saltedBytes := []byte(s)
+	hashedBytes, err := bcrypt.GenerateFromPassword(saltedBytes, bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+
+	hash := string(hashedBytes[:])
+	return hash, nil
+}
+
+//Compare string to generated hash
+func (c *Hash) Compare(hash string, s string) error {
+	incoming := []byte(s)
+	existing := []byte(hash)
+	return bcrypt.CompareHashAndPassword(existing, incoming)
 }
