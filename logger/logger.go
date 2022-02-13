@@ -28,8 +28,8 @@ type logger struct {
 
 func init() {
 	logConfig := zap.Config{
-		OutputPaths: []string{"stdout"},
-		Level:       zap.NewAtomicLevelAt(zap.InfoLevel),
+		OutputPaths: []string{getOutput()},
+		Level:       zap.NewAtomicLevelAt(getLevel()),
 		Encoding:    "json",
 		EncoderConfig: zapcore.EncoderConfig{
 			LevelKey:     "level",
@@ -40,6 +40,7 @@ func init() {
 			EncodeCaller: zapcore.ShortCallerEncoder,
 		},
 	}
+
 	var err error
 	if log.log, err = logConfig.Build(); err != nil {
 		panic(err)
